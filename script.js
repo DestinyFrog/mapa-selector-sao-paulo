@@ -6,7 +6,7 @@ but_add_city.style.display = 'none'
 but_add_city.addEventListener('click', add_city)
 
 const inp_search_city = document.getElementById('inp-search-city')
-inp_search_city.addEventListener('input', search_cities)
+inp_search_city.addEventListener('input', ev => search_cities(ev.target.value))
 
 const ul_cities_list = document.getElementById('list-cities')
 
@@ -14,27 +14,29 @@ var map = L.map('map').setView([-23.5489, -46.6388], 13)
 var layer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
     subdomains: 'abcd',
-    maxZoom: 20
+    maxZoom: 10
 })
 layer.addTo(map)
 
-let cities = undefined // {"NM_RGINT":"São Paulo","CD_MUN":"3513009","NM_MUN":"Cotia"}
+let cities = undefined
 let selected_city = undefined
-let selected_cities = []
+let selected_cities = {}
 
 function set_cities(data) {
     cities = data
 
     datalist_search_city.innerHTML = ''
-    cities.forEach((city, index) => {
+    cities.forEach(city => {
         const option = document.createElement('option')
         option.setAttribute('value', city.NM_MUN)
         datalist_search_city.appendChild(option)
     })
 }
 
-function search_cities(ev) {
-    const value = inp_search_city.value
+async function search_cities(value) {
+    if (!cities)
+        return
+
     const selected = cities.find(city => city.NM_MUN == value)
     if (!selected) {
         but_add_city.style.display = 'none'
@@ -43,10 +45,8 @@ function search_cities(ev) {
 
     but_add_city.style.display = 'block'
 
-    fetch(`./data/${selected.NM_MUN}.json`)
-        .then(text => text.json())
-        .then(data => selected_city = data)
-        .catch(err => console.error)
+    const res = await fetch(`./data/${selected.NM_MUN}.geo.json`)
+    selected_city = await res.json()
 }
 
 function add_city() {
@@ -80,13 +80,14 @@ function add_city() {
     })
     geojson.addTo(map)
 
-    const index = selected_cities.push(geojson) - 1
+    const { NM_MUN } = selected_city.properties
+    selected_cities[NM_MUN]  = geojson
 
     const li = document.createElement('li')
     ul_cities_list.appendChild(li)
 
     const title = document.createElement('p')
-    title.textContent = `${index + 1}. ${selected_city.properties.NM_MUN}`
+    title.textContent = NM_MUN
     title.addEventListener('click', () =>
         map.fitBounds(geojson.getBounds(), {
             animate: true,
@@ -98,16 +99,16 @@ function add_city() {
     const img_delete = document.createElement('img')
     img_delete.alt = 'delete'
     img_delete.src = './delete.svg'
-    img_delete.addEventListener('click', () => remove_city(index, li))
+    img_delete.addEventListener('click', () => remove_city(NM_MUN, li))
     li.appendChild(img_delete)
 
     selected_city = undefined
     inp_search_city.value = ''
 }
 
-function remove_city(index, element) {
-    selected_cities[index].removeFrom(map)
-    selected_cities.splice(index, 1)
+function remove_city(NM_MUN, element) {
+    selected_cities[NM_MUN].removeFrom(map)
+    delete(selected_cities[NM_MUN])
     element.remove()
 }
 
@@ -117,7 +118,7 @@ fetch('./data/index.json')
     .catch(console.error)
 
 fetch('./sp.geo.json')
-    .then(text => text.json())
+.then(text => text.json())
     .then(data =>
         L.geoJSON(data, {
             style: {
@@ -130,14 +131,9 @@ fetch('./sp.geo.json')
             onEachFeature: function (feature, layer) {
                 layer.bindTooltip(feature.properties.NM_MUN, { sticky: true })
                 layer.on({
-                    click: function (_) {
-                        fetch(`./data/${feature.properties.NM_MUN}.json`)
-                            .then(text => text.json())
-                            .then(data => {
-                                selected_city = data
-                                add_city()
-                            })
-                            .catch(console.error)
+                    click: async (_) => {
+                        await search_cities(feature.properties.NM_MUN)
+                        add_city()
                     }
                 })
             },
