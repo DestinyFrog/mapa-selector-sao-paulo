@@ -49,7 +49,7 @@ function search_cities(ev) {
         .catch(err => console.error)
 }
 
-function add_city(ev) {
+function add_city() {
     if (!selected_city) return
 
     const geojson = L.geoJSON(selected_city, {
@@ -86,7 +86,7 @@ function add_city(ev) {
     ul_cities_list.appendChild(li)
 
     const title = document.createElement('p')
-    p.textContent = `${index + 1}. ${selected_city.properties.NM_MUN}`
+    title.textContent = `${index + 1}. ${selected_city.properties.NM_MUN}`
     title.addEventListener('click', () =>
         map.fitBounds(geojson.getBounds(), {
             animate: true,
@@ -114,7 +114,7 @@ function remove_city(index, element) {
 fetch('./data/index.json')
     .then(text => text.json())
     .then(set_cities)
-    .catch(err => console.error)
+    .catch(console.error)
 
 fetch('./sp.geo.json')
     .then(text => text.json())
@@ -137,9 +137,9 @@ fetch('./sp.geo.json')
                                 selected_city = data
                                 add_city()
                             })
-                            .catch(err => console.error)
+                            .catch(console.error)
                     }
                 })
             },
         }).addTo(map))
-    .catch(err => console.error)
+    .catch(console.error)
