@@ -97,7 +97,7 @@ function add_city() {
 
     const img_delete = document.createElement('img')
     img_delete.alt = 'delete'
-    img_delete.src = '/delete.svg'
+    img_delete.src = './delete.svg'
     img_delete.addEventListener('click', () => remove_city(index, li))
     li.appendChild(img_delete)
 
