@@ -43,7 +43,7 @@ function search_cities(ev) {
 
     but_add_city.style.display = 'block'
 
-    fetch(`/data/${selected.NM_MUN}.json`)
+    fetch(`./data/${selected.NM_MUN}.json`)
         .then(text => text.json())
         .then(data => selected_city = data)
         .catch(err => console.error)
@@ -111,12 +111,12 @@ function remove_city(index, element) {
     element.remove()
 }
 
-fetch('/data/index.json')
+fetch('./data/index.json')
     .then(text => text.json())
     .then(set_cities)
     .catch(err => console.error)
 
-fetch('/sp.geo.json')
+fetch('./sp.geo.json')
     .then(text => text.json())
     .then(data =>
         L.geoJSON(data, {
@@ -131,7 +131,7 @@ fetch('/sp.geo.json')
                 layer.bindTooltip(feature.properties.NM_MUN, { sticky: true })
                 layer.on({
                     click: function (_) {
-                        fetch(`/data/${feature.properties.NM_MUN}.json`)
+                        fetch(`./data/${feature.properties.NM_MUN}.json`)
                             .then(text => text.json())
                             .then(data => {
                                 selected_city = data
