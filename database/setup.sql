@@ -45,8 +45,8 @@ CREATE VIEW full_municipio AS
         municipio.codigo,
         municipio.nome,
         municipio.area_km2,
-        geometria.type AS geometria_type,
-        geometria.coordinates AS geometria_coordinates,
+        geometria.tipo AS geometria_tipo,
+        geometria.coordenadas AS geometria_coordenadas,
         rgi.codigo AS rgi_codigo,
         rgi.nome AS rgi_nome,
         rgint.codigo AS rgint_codigo,
@@ -56,7 +56,9 @@ CREATE VIEW full_municipio AS
         uf.sigla AS uf_sigla,
         regiao.codigo AS regiao_codigo,
         regiao.nome AS regiao_nome,
-        regiao.sigla AS regiao_sigla
+        regiao.sigla AS regiao_sigla,
+        municipio_central.codigo AS municipio_central_codigo,
+        municipio_central.nome AS municipio_central_nome
     FROM municipio
     LEFT JOIN geometria ON geometria.id = municipio.geometria_id
     LEFT JOIN rgi ON rgi.codigo = municipio.rgi_codigo
