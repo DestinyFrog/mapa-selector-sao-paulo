@@ -1,6 +1,8 @@
 {
   "dependencies": {
     "@elysia/cors": "^1.4.2",
+    "@elysia/static": "^1.4.11",
+    "@libsql/client": "^0.17.4",
     "@tursodatabase/database": "^0.7.2",
     "elysia": "^1.4.29",
     "leaflet": "^1.9.4"
@@ -15,6 +17,6 @@
   "type": "module",
   "private": true,
   "peerDependencies": {
-    "typescript": "^5"
+    "typescript": "^5.9.3"
   }
 }
