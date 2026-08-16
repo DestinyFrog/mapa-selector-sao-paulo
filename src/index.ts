@@ -34,7 +34,7 @@ function municipio_to_geojson(municipio: any) {
     }
 }
 
-new Elysia()
+const app = new Elysia()
     .use(staticPlugin({
         assets: "dist",
         prefix: "/"
@@ -116,6 +116,11 @@ new Elysia()
             per_page: t.Number(),
         })
     })
-    .listen(process.env.PORT!)
 
-console.log(`Running on :${process.env.PORT!}`)
+
+if (!process.env.VERCEL) {
+    app.listen(process.env.PORT!)
+    console.log(`Running on :${process.env.PORT!}`)
+}
+
+export default app

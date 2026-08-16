@@ -2,7 +2,7 @@
 
 tmux new-session -d -s mapa -n dev
 
-tmux send-keys -t mapa:dev "bun --hot run server/index.ts" 'C-m'
+tmux send-keys -t mapa:dev "bun --hot run src/index.ts" 'C-m'
 tmux split-window -t mapa:dev -h
 tmux send-keys -t mapa:dev "bun --hot web/index.html" 'C-m'
 

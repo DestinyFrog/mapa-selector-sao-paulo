@@ -15,6 +15,10 @@
   "module": "index.ts",
   "type": "module",
   "private": true,
+  "scripts": {
+    "dev": "bun --hot run src/index.ts",
+    "build": "bun build ./web/index.html --outdir ./dist"
+  },
   "peerDependencies": {
     "typescript": "^5.9.3"
   }
