@@ -17,7 +17,7 @@
   "private": true,
   "scripts": {
     "dev": "bun --hot run src/index.ts",
-    "build": "bun build ./web/index.html --outdir ./dist"
+    "build": "bun build ./web/index.html --outdir ./public"
   },
   "peerDependencies": {
     "typescript": "^5.9.3"

@@ -36,7 +36,7 @@ function municipio_to_geojson(municipio: any) {
 
 const app = new Elysia()
     .use(staticPlugin({
-        assets: "dist",
+        assets: "public",
         prefix: "/"
     }))
     .get('/city/search/:term', async ({ params: { term } }) => {
