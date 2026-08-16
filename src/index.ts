@@ -1,7 +1,6 @@
 import { Elysia, status, t } from 'elysia'
-import { cors } from '@elysia/cors'
 import { staticPlugin } from '@elysia/static'
-import { createClient } from '@libsql/client';
+import { createClient } from '@libsql/client'
 
 const db = createClient({
     url: process.env.TURSO_URL!,
@@ -36,9 +35,6 @@ function municipio_to_geojson(municipio: any) {
 }
 
 new Elysia()
-    .use(cors({
-        origin: 'http://localhost:3000'
-    }))
     .use(staticPlugin({
         assets: "dist",
         prefix: "/"
