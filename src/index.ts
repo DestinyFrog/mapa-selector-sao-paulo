@@ -49,9 +49,8 @@ new Elysia()
                 return status(400, { message: "term is required" })
 
             const q = "SELECT * FROM full_municipio WHERE nome LIKE ?"
-            const stmt = await db.prepare(q)
-            const municipios = await stmt.all([ `%${term}%` ])
-            return municipios.map(municipio_to_geojson)
+            const result = await db.execute({ sql: q, args: [ `%${term}%` ] })
+            return result.rows.map(municipio_to_geojson)
         }
         catch (err) {
             console.error(err)
@@ -64,14 +63,14 @@ new Elysia()
                 return status(400, { message: "code is required" })
 
             const q = "SELECT * FROM full_municipio WHERE codigo = ?"
-            const stmt = await db.prepare(q)
-            const municipio = await stmt.get([ code ])
+            const result = await db.execute({ sql: q, args: [ code ] })
+            const municipio = result.rows[0]
             if (!municipio)
                 return status(404, { message: "city not found" })
 
             return {
                 ... municipio,
-                geometria_coordenadas: JSON.parse(municipio['geometria_coordenadas'])
+                geometria_coordenadas: JSON.parse(municipio['geometria_coordenadas'] as string)
             }
         }
         catch (err) {
@@ -85,8 +84,8 @@ new Elysia()
                 return status(400, { message: "code is required" })
 
             const q = "SELECT * FROM full_municipio WHERE codigo = ?"
-            const stmt = await db.prepare(q)
-            const municipio = await stmt.get([ code ])
+            const result = await db.execute({ sql: q, args: [ code ] })
+            const municipio = result.rows[0]
             if (!municipio)
                 return status(404, { message: "city not found" })
 
@@ -100,15 +99,14 @@ new Elysia()
     .get('/city', async ({ query: { page, per_page } }) => {
         try {
             const q1 = `SELECT COUNT(*) AS total FROM municipio`
-            const stmt1 = await db.prepare(q1)
-            const total = (await stmt1.get()).total
+            const total1 = await db.execute(q1)
+            const total = total1.rows[0]?.total ?? 0
 
-            const q = `SELECT * FROM full_municipio LIMIT ${per_page} OFFSET ${page * per_page}`
-            const stmt = await db.prepare(q)
-            const municipios = await stmt.all()
+            const q = `SELECT * FROM full_municipio LIMIT ? OFFSET ?`
+            const result = await db.execute({ sql: q, args: [ per_page, page * per_page ] })
 
             return {
-                data: municipios.map(municipio_to_geojson),
+                data: result.rows.map(municipio_to_geojson),
                 total
             }
         }
